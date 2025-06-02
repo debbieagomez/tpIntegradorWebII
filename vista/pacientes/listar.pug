@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title Pacientes
+  body
+    h1 Lista de Pacientes
+    a(href='/pacientes/nuevo') Nuevo Paciente
+    ul
+      each paciente in pacientes
+        li
+          a(href=`/pacientes/${paciente.id}`) #{paciente.nombre}
