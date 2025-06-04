@@ -15,7 +15,7 @@ app.listen(PORT, () => {
 app.set('view engine', 'pug'); //configura pug como motor de plantillas
 app.set('views', path.join(__dirname, 'vista')); //configura la carpeta donde estan las vistas
 
-app.use(express.static(path.join(__dirname, 'public'))); //para servir archivos estaticos
+
 
 
 //middleware
@@ -37,8 +37,7 @@ app.use('/internacion', internacionRouter); //usa las rutas de internacion
 app.use('/paciente', pacientesRouter); //usa las rutas de pacientes
 
 
-//rutas
-app.use('/pacientes', pacientesRouter); //usa las rutas de pacientes
+
 
 //ruta principal 
 app.get('/', (req, res) => {

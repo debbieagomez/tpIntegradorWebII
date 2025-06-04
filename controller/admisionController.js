@@ -4,8 +4,8 @@ const {
     obtenerAdmisiones,
     obtenerAdmisionPorPaciente,
     eliminarAdmisionPorPaciente
-} = require('../modelos/admision');
-const { pacientes } = require('../modelos/paciente');
+} = require('../modelo/admision');
+const { pacientes } = require('../modelo/paciente');
 
 class AdmisionController {
     // Listar todas las admisiones
