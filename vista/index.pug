@@ -1,9 +1,10 @@
 doctype html
 html
   head
-    title Sistema HIS
+    title= title
   body
-    h1 Bienvenido al Sistema HIS
+    h1= message
+    p Esta es la página de inicio.
     ul
-      li: a(href="/pacientes/nuevo") Registrar nuevo paciente
-      li: a(href="/admisiones/nueva") Nueva admisión
+      li: a(href="/paciente") Ver pacientes
+      li: a(href="/admision") Ver admisiones

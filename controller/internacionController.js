@@ -1,6 +1,6 @@
 const {
     Internacion,
-    Paciente,
+    paciente,
     obtenerInternaciones,
     obtenerInternacionPorId,
     agregarInternacion,

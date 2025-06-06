@@ -4,6 +4,7 @@ const router = express.Router();
 const AdmisionController = require('../controller/admisionController');
 
 // Rutas para admisiones
+router.get('/nuevo', AdmisionController.nuevaAdmision); // Formulario para nueva admisión
 router.get('/', AdmisionController.listarAdmisiones); // Listar admisiones
 router.get('/:id', AdmisionController.verAdmision); // Ver admisión de un paciente
 router.post('/', AdmisionController.crearAdmision); // Crear nueva admisión

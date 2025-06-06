@@ -1,6 +1,6 @@
 const {
     agregarAdmision,
-    actualizarAdmision,
+     actualizarAdmision,
     obtenerAdmisiones,
     obtenerAdmisionPorPaciente,
     eliminarAdmisionPorPaciente
@@ -12,6 +12,11 @@ class AdmisionController {
     static listarAdmisiones(req, res) {
         const admisiones = obtenerAdmisiones();
         res.render('admision/listar', { admisiones });
+    }
+    static nuevaAdmision(req, res) {
+        console.log('cargando vista formularioAd');
+        // Renderizar el formulario para crear una nueva admisión
+        res.render('admision/formularioAd', { pacientes });
     }
 
     // Ver todas las admisiones de un paciente
