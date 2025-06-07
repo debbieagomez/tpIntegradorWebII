@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title Lista de Admisiones
+  body
+    h1 Lista de Admisiones
+    ul
+      if admisiones.length
+        each admision in admisiones
+          li Fecha: #{admision.fechaIngreso} - Motivo: #{admision.motivoIngreso}
+      else
+        li No hay admisiones registradas.
+
+    a(href='/') Volver al inicio

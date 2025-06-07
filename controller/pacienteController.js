@@ -20,7 +20,7 @@ const pacienteController = {
   crearPaciente(req, res) {
     const { nombre, dni, sexo } = req.body;
     agregarPaciente({ nombre, dni, sexo });
-    res.redirect('/pacientes');
+    res.redirect('/paciente');
   },
 
   verPaciente(req, res) {

@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    title Lista de Pacientes
+  body
+    h1 Lista de Pacientes
+
+    ul
+      if pacientes.length
+        each paciente in pacientes
+          li #{paciente.nombre} - DNI: #{paciente.dni} - Sexo: #{paciente.sexo}
+      else
+        li No hay pacientes registrados.
+
+    a(href='/') Volver al inicio
+
