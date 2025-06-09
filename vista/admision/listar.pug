@@ -1,14 +1,18 @@
-doctype html
-html
-  head
-    title Lista de Admisiones
-  body
-    h1 Lista de Admisiones
-    ul
-      if admisiones.length
-        each admision in admisiones
-          li Fecha: #{admision.fechaIngreso} - Motivo: #{admision.motivoIngreso}
-      else
-        li No hay admisiones registradas.
+extends ../layout
 
-    a(href='/') Volver al inicio
+block content
+  h1 Lista de Admisiones
+  a(href='/admision/nueva') + Nueva Admisión
+
+  if admisiones.length === 0
+    p No hay admisiones registradas.
+  else
+    ul
+      each admision in admisiones
+        li
+          | Paciente ID: #{admision.pacienteId} - Fecha: #{admision.fechaIngreso} - Motivo: #{admision.motivoIngreso}
+          a(href=`/admision/${admision.pacienteId}`) 🔍 Ver
+          a(href=`/admision/${admision.pacienteId}/editar`) 🖊 Editar
+          form(method='POST', action=`/admision/${admision.pacienteId}/eliminar`, style='display:inline')
+            button(type='submit') ❌ Eliminar
+

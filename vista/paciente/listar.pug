@@ -1,16 +1,19 @@
-doctype html
-html
-  head
-    title Lista de Pacientes
-  body
-    h1 Lista de Pacientes
+extends ../layout
 
+block content
+  h1 Lista de Pacientes
+  a(href='/paciente/crear') + Agregar Nuevo Paciente
+
+  if pacientes.length === 0
+    p No hay pacientes registrados.
+  else
     ul
-      if pacientes.length
-        each paciente in pacientes
-          li #{paciente.nombre} - DNI: #{paciente.dni} - Sexo: #{paciente.sexo}
-      else
-        li No hay pacientes registrados.
+      each paciente in pacientes
+        li
+          | #{paciente.nombre} - DNI: #{paciente.dni} - Sexo: #{paciente.sexo}
+          a(href=`/paciente/${paciente.id}/editar`) 🖊 Editar
+          form(method='POST', action=`/paciente/${paciente.id}/eliminar`, style='display:inline')
+            button(type='submit') ❌ Eliminar
 
-    a(href='/') Volver al inicio
+
 

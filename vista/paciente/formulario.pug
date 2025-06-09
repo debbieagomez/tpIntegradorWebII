@@ -1,0 +1,16 @@
+extends ../layout
+
+form(method='POST', action='/paciente/nuevo')
+  label Nombre:
+  input(type='text', name='nombre', required)
+  br
+  label DNI:
+  input(type='text', name='dni', required)
+  br
+  label Sexo:
+  select(name='sexo')
+    option(value='F') Femenino
+    option(value='M') Masculino
+  br
+  button(type='submit') Registrar
+    a(href='/paciente/listar') Volver a la lista de pacientes
