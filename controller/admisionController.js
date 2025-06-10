@@ -1,67 +1,97 @@
-const {
-    agregarAdmision,
-     actualizarAdmision,
-    obtenerAdmisiones,
-    obtenerAdmisionPorPaciente,
-    eliminarAdmisionPorPaciente
-} = require('../modelo/admision');
-const { pacientes } = require('../modelo/paciente');
+const { Admision, Paciente, Cama, Habitacion } = require('../models');
+const { Op } = require('sequelize');
 
-class AdmisionController {
-    // Listar todas las admisiones
-    static listarAdmisiones(req, res) {
-        const admisiones = obtenerAdmisiones();
-        res.render('admision/listar', { admisiones });
+const admisionController = {
+  listarAdmisiones: async function (req, res) {
+    try {
+      const admisiones = await Admision.findAll({
+        include: [Paciente, Cama]
+      });
+      res.render('admision/listar', { admisiones });
+    } catch (error) {
+      console.error('Error al listar admisiones:', error);
+      res.status(500).send('Error al listar admisiones');
     }
-    static nuevaAdmision(req, res) {
-        console.log('cargando vista formularioAd');
-        // Renderizar el formulario para crear una nueva admisión
-        res.render('admision/formularioAd', { pacientes });
+  },
+
+  nuevaAdmision: async function (req, res) {
+    try {
+      const pacientes = await Paciente.findAll();
+      const camas = await Cama.findAll({ where: { disponible: true } });
+      res.render('admision/formularioAd', { pacientes, camas });
+    } catch (error) {
+      console.error('Error al mostrar formulario de admisión:', error);
+      res.status(500).send('Error al cargar el formulario');
     }
+  },
 
-    // Ver todas las admisiones de un paciente
-    static verAdmision(req, res) {
-        const pacienteId = parseInt(req.params.id);
-        const admisionesPaciente = obtenerAdmisionPorPaciente(pacienteId);
-        const paciente = pacientes.find(p => p.id === pacienteId);
+  crearAdmision: async function (req, res) {
+    try {
+      const { pacienteId, camaId, motivoIngreso, fechaIngreso } = req.body;
 
-        if (!paciente) return res.status(404).send('Paciente no encontrado');
+      const paciente = await Paciente.findByPk(pacienteId);
+      const cama = await Cama.findByPk(camaId, { include: Habitacion });
 
-        res.render('admision/ver', {
-            paciente,
-            admisiones: admisionesPaciente
-        });
+      if (!paciente || !cama || !cama.disponible) {
+        return res.status(400).send('Paciente o cama inválida');
+      }
+
+      const habitacion = cama.Habitacion;
+      const camasOcupadas = await Cama.findAll({
+        where: {
+          habitacionId: habitacion.id,
+          disponible: false,
+          id: { [Op.ne]: cama.id }
+        },
+        include: {
+          model: Admision,
+          where: { fechaEgreso: null }
+        }
+      });
+
+      const conflictoSexo = await Promise.all(
+        camasOcupadas.map(async camaOcupada => {
+          const adm = await Admision.findOne({
+            where: { camaId: camaOcupada.id, fechaEgreso: null },
+            include: Paciente
+          });
+          return adm && adm.Paciente.sexo !== paciente.sexo;
+        })
+      );
+
+      if (conflictoSexo.includes(true)) {
+        return res.status(400).send('Conflicto de sexo en habitación compartida.');
+      }
+
+      await Admision.create({
+        pacienteId,
+        camaId,
+        motivoIngreso,
+        fechaIngreso,
+        estado: 'activa'
+      });
+
+      await cama.update({ disponible: false });
+
+      res.redirect('/admision');
+    } catch (error) {
+      console.error('Error al crear admisión:', error);
+      res.status(500).send('Error al registrar admisión');
     }
+  },
 
-    // Crear una nueva admisión
-    static crearAdmision(req, res) {
-        const { pacienteId, fechaIngreso, motivoIngreso } = req.body;
-        const paciente = pacientes.find(p => p.id === parseInt(pacienteId));
-        if (!paciente) return res.status(404).send('Paciente no encontrado');
-
-        const nuevaAdmision = agregarAdmision({ pacienteId: paciente.id, fechaIngreso, motivoIngreso });
-        res.redirect(`/admision/${paciente.id}`);
+  verAdmision: async function (req, res) {
+    try {
+      const admision = await Admision.findByPk(req.params.id, {
+        include: [Paciente, Cama]
+      });
+      if (!admision) return res.status(404).send('Admisión no encontrada');
+      res.render('admision/ver', { admision });
+    } catch (error) {
+      console.error('Error al ver admisión:', error);
+      res.status(500).send('Error al mostrar la admisión');
     }
+  }
+};
 
-    // Actualizar una admisión específica
-    static actualizarAdmision(req, res) {
-        const admisionId = parseInt(req.params.id);
-        const { fechaIngreso, motivoIngreso } = req.body;
-
-        const admisionActualizada = actualizarAdmision(admisionId, { fechaIngreso, motivoIngreso });
-        if (!admisionActualizada) return res.status(404).send('Admisión no encontrada');
-
-        res.redirect(`/admision/${admisionActualizada.pacienteId}`);
-    }
-
-    // Eliminar todas las admisiones de un paciente
-    static eliminarAdmision(req, res) {
-        const pacienteId = parseInt(req.params.id);
-        eliminarAdmisionPorPaciente(pacienteId);
-        res.redirect('/admision');
-    }
-}
-
-module.exports = AdmisionController;
-// Este controlador maneja las operaciones CRUD para las admisiones de pacientes en un sistema hospitalario.
-// Permite listar, ver, crear, actualizar y eliminar admisiones asociadas a pacientes.
+module.exports = admisionController;

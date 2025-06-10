@@ -1,111 +1,48 @@
-const {
-  obtenerPacientes,
-  agregarPaciente,
-  buscarPacientePorId,
-  actualizarPaciente,
-  eliminarPaciente,
-  buscarPorNombre
-} = require('../modelo/paciente');
+const { Paciente } = require('../models');
 
 const pacienteController = {
-  listarPacientes(req, res) {
-    const pacientes = obtenerPacientes();
-    res.render('paciente/listar', { pacientes });
+  listarPacientes: async function (req, res) {
+    try {
+      const pacientes = await Paciente.findAll();
+      res.render('paciente/listar', { pacientes });
+    } catch (error) {
+      console.error('Error al listar pacientes:', error);
+      res.status(500).send('Error al obtener los pacientes');
+    }
   },
 
-  nuevoPaciente(req, res) {
-    res.render('paciente/formulario', { paciente: null });
+  nuevoPaciente: async function (req, res) {
+    try {
+      res.render('paciente/formulario', { paciente: null });
+    } catch (error) {
+      console.error('Error al mostrar formulario:', error);
+      res.status(500).send('Error al mostrar el formulario');
+    }
   },
 
-  crearPaciente(req, res) {
-    const { nombre, dni, sexo } = req.body;
-    agregarPaciente({ nombre, dni, sexo });
-    res.redirect('/paciente');
+  crearPaciente: async function (req, res) {
+    try {
+      const { nombre, dni, sexo } = req.body;
+      await Paciente.create({ nombre, dni, sexo });
+      res.redirect('/paciente');
+    } catch (error) {
+      console.error('Error al crear paciente:', error);
+      res.status(500).send('Error al crear el paciente');
+    }
   },
 
-  verPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/detalle', { paciente });
-  },
-
-  editarPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/formulario', { paciente });
-  },
-
-  actualizarPaciente(req, res) {
-    const id = parseInt(req.params.id);
-    const { nombre, dni, sexo } = req.body;
-    const actualizado = actualizarPaciente(id, { nombre, dni, sexo });
-    if (!actualizado) return res.status(404).send('Paciente no encontrado');
-    res.redirect('/pacientes');
-  },
-
-  eliminarPaciente(req, res) {
-    const eliminado = eliminarPaciente(parseInt(req.params.id));
-    if (!eliminado) return res.status(404).send('Paciente no encontrado');
-    res.redirect('/pacientes');
-  },
-
-  buscarPacientes(req, res) {
-    const { query } = req.query;
-    const resultados = buscarPorNombre(query);
-    res.render('paciente/buscar', { resultados, query });
-  },
-
-  
-  verHistorialPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/historial', { paciente, historial: [] });
-  },
-  verInternacionesPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/internaciones', { paciente, internaciones: [] });
-  },
-  verHabitacionesPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/habitaciones', { paciente, habitaciones: [] });
-  },
-  verConsultasPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/consultas', { paciente, consultas: [] });
-  },
-  verTratamientosPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/tratamientos', { paciente, tratamientos: [] });
-  },
-  verMedicamentosPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/medicamentos', { paciente, medicamentos: [] });
-  },
-  verResultadosPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/resultados', { paciente, resultados: [] });
-  },
-  verCitasPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/citas', { paciente, citas: [] });
-  },
-  verFacturasPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/facturas', { paciente, facturas: [] });
-  },
-  verDocumentosPaciente(req, res) {
-    const paciente = buscarPacientePorId(parseInt(req.params.id));
-    if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/documentos', { paciente, documentos: [] });
+  verPaciente: async function (req, res) {
+    try {
+      const paciente = await Paciente.findByPk(req.params.id);
+      if (!paciente) return res.status(404).send('Paciente no encontrado');
+      res.render('paciente/detalle', { paciente });
+    } catch (error) {
+      console.error('Error al ver paciente:', error);
+      res.status(500).send('Error al mostrar el paciente');
+    }
   }
 };
 
 module.exports = pacienteController;
+
+
