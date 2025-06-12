@@ -1,57 +1,95 @@
-const {
-  obtenerCamas,
-  obtenerCamasDisponibles,
-  obtenerCamaPorId,
-  agregarCama,
-  actualizarCama,
-  eliminarCamaPorId,
-} = require('../modelo/cama');
+const { Cama, Habitacion } = require('../models');
 
 const camaController = {
-  // Listar todas las camas
-  listarCamas: (req, res) => {
-    const camas = obtenerCamas();
-    res.render('cama/listar', { camas });
+  listarCamas: async function (req, res) {
+    try {
+      const camas = await Cama.findAll({ include: Habitacion });
+      res.render('cama/listar', { camas });
+    } catch (error) {
+      console.error('Error al listar camas:', error);
+      res.status(500).send('Error al listar camas');
+    }
+  },
+  listarCamasDisponibles: async function (req, res) {
+    try {
+      const camas = await Cama.findAll({ where: { disponible: true }, include: Habitacion });
+      res.render('cama/listar', { camas });
+    } catch (error) {
+      console.error('Error al listar camas disponibles:', error);
+      res.status(500).send('Error al listar camas disponibles');
+    }
   },
 
-  // Listar camas disponibles
-  listarCamasDisponibles: (req, res) => {
-    const camasDisponibles = obtenerCamasDisponibles();
-    res.render('cama/disponibles', { camas: camasDisponibles });
+  nuevaCama: async function (req, res) {
+    try {
+      const habitaciones = await Habitacion.findAll();
+      res.render('cama/formulario', { habitaciones });
+    } catch (error) {
+      console.error('Error al cargar formulario de cama:', error);
+      res.status(500).send('Error al cargar formulario');
+    }
   },
 
-  // Ver detalles de una cama específica
-  verCama: (req, res) => {
-    const camaId = parseInt(req.params.id);
-    const cama = obtenerCamaPorId(camaId);
-    if (!cama) return res.status(404).send('Cama no encontrada');
-    res.render('cama/ver', { cama });
+  crearCama: async function (req, res) {
+    try {
+      const { numero, tipo, disponible, habitacionId } = req.body;
+      await Cama.create({
+        numero,
+        tipo,
+        disponible: disponible === 'true',
+        habitacionId
+      });
+      res.redirect('/cama');
+    } catch (error) {
+      console.error('Error al crear cama:', error);
+      res.status(500).send('Error al crear cama');
+    }
   },
 
-  // Crear una nueva cama
-  crearCama: (req, res) => {
-    const { numero, tipo, disponible } = req.body;
-    const nuevaCama = agregarCama({ numero, tipo, disponible: disponible === 'true' });
-    res.redirect('/camas');
+  verCama: async function (req, res) {
+    try {
+      const cama = await Cama.findByPk(req.params.id, { include: Habitacion });
+      if (!cama) return res.status(404).send('Cama no encontrada');
+      res.render('cama/ver', { cama });
+    } catch (error) {
+      console.error('Error al ver cama:', error);
+      res.status(500).send('Error al cargar cama');
+    }
   },
 
-  // Actualizar una cama específica
-  actualizarCama: (req, res) => {
-    const camaId = parseInt(req.params.id);
-    const { numero, tipo, disponible } = req.body;
-    const camaActualizada = actualizarCama(camaId, { numero, tipo, disponible: disponible === 'true' });
-    if (!camaActualizada) return res.status(404).send('Cama no encontrada');
-    res.redirect(`/camas/${camaId}`);
+  actualizarCama: async function (req, res) {
+    try {
+      const { numero, tipo, disponible, habitacionId } = req.body;
+      const cama = await Cama.findByPk(req.params.id);
+      if (!cama) return res.status(404).send('Cama no encontrada');
+
+      await cama.update({
+        numero,
+        tipo,
+        disponible: disponible === 'true',
+        habitacionId
+      });
+
+      res.redirect(`/cama/${cama.id}`);
+    } catch (error) {
+      console.error('Error al actualizar cama:', error);
+      res.status(500).send('Error al actualizar cama');
+    }
   },
 
-  // Eliminar una cama específica
-  eliminarCama: (req, res) => {
-    const camaId = parseInt(req.params.id);
-    eliminarCamaPorId(camaId);
-    res.redirect('/camas');
+  eliminarCama: async function (req, res) {
+    try {
+      const cama = await Cama.findByPk(req.params.id);
+      if (!cama) return res.status(404).send('Cama no encontrada');
+
+      await cama.destroy();
+      res.redirect('/cama');
+    } catch (error) {
+      console.error('Error al eliminar cama:', error);
+      res.status(500).send('Error al eliminar cama');
+    }
   }
 };
 
 module.exports = camaController;
-
 

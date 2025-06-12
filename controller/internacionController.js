@@ -1,110 +1,109 @@
-const {
-    Internacion,
-    paciente,
-    obtenerInternaciones,
-    obtenerInternacionPorId,
-    agregarInternacion,
-    actualizarInternacion,
-    obtenerInternacionesDisponibles,
-    eliminarInternacionPorId,
-    obtenerInternacionesPorPaciente,
-    eliminarInternacionesPorPaciente,
-} = require('../modelo/internacion');
-const { pacientes } = require('../modelo/paciente');
+const { Internacion, Admision, Paciente, Cama } = require('../models');
 
-class InternacionController {
-    // Listar todas las internaciones
-    static listarInternaciones(req, res) {
-        const internaciones = obtenerInternaciones();
-        res.render('internacion/listar', { internaciones });
+const internacionController = {
+  listarInternaciones: async function (req, res) {
+    try {
+      const internaciones = await Internacion.findAll({
+        include: {
+          model: Admision,
+          include: [Paciente, Cama]
+        }
+      });
+      res.render('internacion/listar', { internaciones });
+    } catch (error) {
+      console.error('Error al listar internaciones:', error);
+      res.status(500).send('Error al listar internaciones');
     }
+  },
 
-    // Ver una internación específica
-    static verInternacion(req, res) {
-        const id = parseInt(req.params.id);
-        const internacion = obtenerInternacionPorId(id);
-        if (!internacion) return res.status(404).send('Internación no encontrada');
-        res.render('internacion/detalle', { internacion });
+  nuevaInternacion: async function (req, res) {
+    try {
+      const admisiones = await Admision.findAll({
+        where: { estado: 'activa' },
+        include: [Paciente, Cama]
+      });
+
+      res.render('internacion/formulario', { admisiones });
+    } catch (error) {
+      console.error('Error al mostrar formulario de internación:', error);
+      res.status(500).send('Error al cargar formulario');
     }
+  },
 
-    // Crear una nueva internación
-    static crearInternacion(req, res) {
-        const { pacienteId, fechaIngreso, motivoIngreso } = req.body;
-        const paciente = pacientes.find(p => p.id === parseInt(pacienteId));
-        if (!paciente) return res.status(404).send('Paciente no encontrado');
+  crearInternacion: async function (req, res) {
+    try {
+      const { admisionId, diagnostico, tratamiento } = req.body;
 
-        const nuevaInternacion = agregarInternacion({ pacienteId: paciente.id, fechaIngreso, motivoIngreso });
-        res.redirect(`/internacion/${nuevaInternacion.id}`);
+      const admision = await Admision.findByPk(admisionId);
+      if (!admision || admision.estado !== 'activa') {
+        return res.status(400).send('Admisión no válida');
+      }
+
+      await Internacion.create({
+        admisionId,
+        diagnostico,
+        tratamiento,
+        fechaInicio: new Date(),
+        estado: 'activa'
+      });
+
+      res.redirect('/internacion');
+    } catch (error) {
+      console.error('Error al crear internación:', error);
+      res.status(500).send('Error al registrar internación');
     }
+  },
 
-    // Actualizar una internación específica
-    static actualizarInternacion(req, res) {
-        const id = parseInt(req.params.id);
-        const { fechaIngreso, motivoIngreso } = req.body;
+  finalizarInternacion: async function (req, res) {
+    try {
+      const id = req.params.id;
+      const internacion = await Internacion.findByPk(id, {
+        include: { model: Admision, include: Cama }
+      });
 
-        const internacionActualizada = actualizarInternacion(id, { fechaIngreso, motivoIngreso });
-        if (!internacionActualizada) return res.status(404).send('Internación no encontrada');
+      if (!internacion || internacion.estado !== 'activa') {
+        return res.status(404).send('Internación no activa encontrada');
+      }
 
-        res.redirect(`/internacion/${internacionActualizada.id}`);
+      // Marcar como finalizada
+      await internacion.update({
+        estado: 'finalizada',
+        fechaFin: new Date()
+      });
+
+      // Finalizar admisión y liberar cama
+      await internacion.Admision.update({
+        estado: 'finalizada',
+        fechaEgreso: new Date()
+      });
+
+      await internacion.Admision.Cama.update({ disponible: true });
+
+      res.redirect('/internacion');
+    } catch (error) {
+      console.error('Error al finalizar internación:', error);
+      res.status(500).send('Error al finalizar internación');
     }
+  },
 
-    // Eliminar una internación específica
-    static eliminarInternacion(req, res) {
-        const id = parseInt(req.params.id);
-        const internacionEliminada = eliminarInternacionPorId(id);
-        if (!internacionEliminada) return res.status(404).send('Internación no encontrada');
+  verInternacion: async function (req, res) {
+    try {
+      const internacion = await Internacion.findByPk(req.params.id, {
+        include: {
+          model: Admision,
+          include: [Paciente, Cama]
+        }
+      });
 
-        res.redirect('/internacion');
+      if (!internacion) return res.status(404).send('Internación no encontrada');
+
+      res.render('internacion/ver', { internacion });
+    } catch (error) {
+      console.error('Error al mostrar internación:', error);
+      res.status(500).send('Error al mostrar detalles');
     }
-    // Listar internaciones disponibles
-    static listarInternacionesDisponibles(req, res) {
-        const internacionesDisponibles = obtenerInternacionesDisponibles();
-        res.render('internacion/disponibles', { internaciones: internacionesDisponibles });
-    }
-    // Ver todas las internaciones de un paciente
-    static verInternacionesPorPaciente(req, res) {
-        const pacienteId = parseInt(req.params.id);
-        const internacionesPaciente = obtenerInternacionesPorPaciente(pacienteId);
-        const paciente = pacientes.find(p => p.id === pacienteId);
+  }
+};
 
-        if (!paciente) return res.status(404).send('Paciente no encontrado');
+module.exports = internacionController;
 
-        res.render('internacion/ver', {
-            paciente,
-            internaciones: internacionesPaciente
-        });
-    }
-    // Eliminar todas las internaciones de un paciente
-    static eliminarInternacionesPorPaciente(req, res) {
-        const pacienteId = parseInt(req.params.id);
-        const internacionesEliminadas = eliminarInternacionesPorPaciente(pacienteId);
-        if (!internacionesEliminadas) return res.status(404).send('No se encontraron internaciones para eliminar');
-
-        res.redirect('/internacion');
-    }
-    // Crear una nueva internación para un paciente
-    static crearInternacionPorPaciente(req, res) {
-        const pacienteId = parseInt(req.params.id);
-        const { fechaIngreso, motivoIngreso } = req.body;
-        const paciente = pacientes.find(p => p.id === pacienteId);
-        if (!paciente) return res.status(404).send('Paciente no encontrado');
-
-        const nuevaInternacion = agregarInternacion({ pacienteId: paciente.id, fechaIngreso, motivoIngreso });
-        res.redirect(`/internacion/${nuevaInternacion.id}`);
-    }
-    // Actualizar una internación específica de un paciente
-    static actualizarInternacionPorPaciente(req, res) {
-        const pacienteId = parseInt(req.params.id);
-        const { fechaIngreso, motivoIngreso } = req.body;
-
-        const internacionActualizada = actualizarInternacion(pacienteId, { fechaIngreso, motivoIngreso });
-        if (!internacionActualizada) return res.status(404).send('Internación no encontrada');
-
-        res.redirect(`/internacion/${internacionActualizada.id}`);
-    }
-   
-    
-
-}
-module.exports = InternacionController;
-// Exportar el controlador para usarlo en las rutas

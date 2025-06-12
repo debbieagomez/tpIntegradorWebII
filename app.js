@@ -27,12 +27,14 @@ app.get('/', (req, res) => {
 
 
 //Importacion de rutas
+const indexRouter = require('./rutas/index'); //importa las rutas principales
 const pacientesRouter = require('./rutas/pacientes'); //importa las rutas de pacientes
 const admisionRouter = require('./rutas/admision'); //importa las rutas de admision
 const habitacionRouter = require('./rutas/habitacion'); //importa las rutas de habitacion
 const camaRouter = require('./rutas/cama'); //importa las rutas de cama
 const internacionRouter = require('./rutas/internacion'); //importa las rutas de internacion
-//uso de rutas 
+//uso de rutas
+app.use('/', indexRouter); //usa las rutas principales
 app.use('/admision', admisionRouter); //usa las rutas de admision
 app.use('/habitacion', habitacionRouter); //usa las rutas de habitacion
 app.use('/cama', camaRouter); //usa las rutas de cama

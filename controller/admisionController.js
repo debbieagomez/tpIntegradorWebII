@@ -91,7 +91,37 @@ const admisionController = {
       console.error('Error al ver admisión:', error);
       res.status(500).send('Error al mostrar la admisión');
     }
+  },
+
+  actualizarAdmision: async function (req, res) {
+    try {
+      const { motivoIngreso, fechaIngreso } = req.body;
+      const admision = await Admision.findByPk(req.params.id);
+      if (!admision) return res.status(404).send('Admisión no encontrada');
+
+      await admision.update({ motivoIngreso, fechaIngreso });
+      res.redirect(`/admision/${admision.id}`);
+    } catch (error) {
+      console.error('Error al actualizar admisión:', error);
+      res.status(500).send('Error al actualizar la admisión');
+    }
+  },
+  eliminarAdmision: async function (req, res) {
+    try {
+      const admision = await Admision.findByPk(req.params.id);
+      if (!admision) return res.status(404).send('Admisión no encontrada');
+
+      await admision.update({ estado: 'finalizada', fechaEgreso: new Date() });
+      const cama = await Cama.findByPk(admision.camaId);
+      await cama.update({ disponible: true });
+
+      res.redirect('/admision');
+    } catch (error) {
+      console.error('Error al eliminar admisión:', error);
+      res.status(500).send('Error al eliminar la admisión');
+    }
   }
+
 };
 
 module.exports = admisionController;

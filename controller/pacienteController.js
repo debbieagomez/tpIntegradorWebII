@@ -1,48 +1,93 @@
 const { Paciente } = require('../models');
 
-const pacienteController = {
-  listarPacientes: async function (req, res) {
-    try {
-      const pacientes = await Paciente.findAll();
-      res.render('paciente/listar', { pacientes });
-    } catch (error) {
-      console.error('Error al listar pacientes:', error);
-      res.status(500).send('Error al obtener los pacientes');
-    }
-  },
 
-  nuevoPaciente: async function (req, res) {
-    try {
-      res.render('paciente/formulario', { paciente: null });
-    } catch (error) {
-      console.error('Error al mostrar formulario:', error);
-      res.status(500).send('Error al mostrar el formulario');
-    }
-  },
-
-  crearPaciente: async function (req, res) {
-    try {
-      const { nombre, dni, sexo } = req.body;
-      await Paciente.create({ nombre, dni, sexo });
-      res.redirect('/paciente');
-    } catch (error) {
-      console.error('Error al crear paciente:', error);
-      res.status(500).send('Error al crear el paciente');
-    }
-  },
-
-  verPaciente: async function (req, res) {
-    try {
-      const paciente = await Paciente.findByPk(req.params.id);
-      if (!paciente) return res.status(404).send('Paciente no encontrado');
-      res.render('paciente/detalle', { paciente });
-    } catch (error) {
-      console.error('Error al ver paciente:', error);
-      res.status(500).send('Error al mostrar el paciente');
-    }
+async function listarPacientes(req, res) {
+  try {
+    const pacientes = await Paciente.findAll();
+    res.render('paciente/listar', { pacientes });
+  } catch (error) {
+    console.error('Error al listar pacientes:', error);
+    res.status(500).send('Error al obtener los pacientes');
   }
-};
+}
 
-module.exports = pacienteController;
+async function nuevoPaciente(req, res) {
+  try {
+    res.render('paciente/formulario', { paciente: null });
+  } catch (error) {
+    console.error('Error al mostrar formulario:', error);
+    res.status(500).send('Error al mostrar el formulario');
+  }
+}
+
+async function crearPaciente(req, res) {
+  try {
+    const { nombre, dni, sexo } = req.body;
+    await Paciente.create({ nombre, dni, sexo });
+    res.redirect('/paciente');
+  } catch (error) {
+    console.error('Error al crear paciente:', error);
+    res.status(500).send('Error al crear el paciente');
+  }
+}
+
+async function verPaciente(req, res) {
+  try {
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) return res.status(404).send('Paciente no encontrado');
+    res.render('paciente/detalle', { paciente });
+  } catch (error) {
+    console.error('Error al ver paciente:', error);
+    res.status(500).send('Error al mostrar el paciente');
+  }
+}
+
+async function editarPaciente(req, res) {
+  try {
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) return res.status(404).send('Paciente no encontrado');
+    res.render('paciente/formulario', { paciente });
+  } catch (error) {
+    console.error('Error al editar paciente:', error);
+    res.status(500).send('Error al editar el paciente');
+  }
+}
+
+async function actualizarPaciente(req, res) {
+  try {
+    const { nombre, dni, sexo } = req.body;
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) return res.status(404).send('Paciente no encontrado');
+
+    await paciente.update({ nombre, dni, sexo });
+    res.redirect(`/paciente/${paciente.id}`);
+  } catch (error) {
+    console.error('Error al actualizar paciente:', error);
+    res.status(500).send('Error al actualizar el paciente');
+  }
+}
+
+async function eliminarPaciente(req, res) {
+  try {
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) return res.status(404).send('Paciente no encontrado');
+
+    await paciente.destroy();
+    res.redirect('/paciente');
+  } catch (error) {
+    console.error('Error al eliminar paciente:', error);
+    res.status(500).send('Error al eliminar el paciente');
+  }
+}
+
+module.exports = {
+  listarPacientes,
+  nuevoPaciente,
+  crearPaciente,
+  verPaciente,
+  editarPaciente,
+  actualizarPaciente,
+  eliminarPaciente
+};
 
 

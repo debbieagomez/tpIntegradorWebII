@@ -1,15 +1,14 @@
-const express = require('express');
+const express = require ('express');
 const router = express.Router();
+const admisionController = require('../controller/admisionController');
 
-const AdmisionController = require('../controller/admisionController');
+router.get('/', admisionController.listarAdmisiones);
+router.get('/nueva', admisionController.nuevaAdmision);
+router.post('/crear', admisionController.crearAdmision);
+router.get('/:id', admisionController.verAdmision);
+router.post('/:id/editar', admisionController.actualizarAdmision);
+router.post('/:id/eliminar', admisionController.eliminarAdmision);
 
-// Rutas para admisiones
-router.get('/nuevo', AdmisionController.nuevaAdmision); // Formulario para nueva admisión
-router.get('/', AdmisionController.listarAdmisiones); // Listar admisiones
-router.get('/:id', AdmisionController.verAdmision); // Ver admisión de un paciente
-router.post('/', AdmisionController.crearAdmision); // Crear nueva admisión
-router.post('/:id/editar', AdmisionController.actualizarAdmision); // Actualizar admisión
-router.post('/:id/eliminar', AdmisionController.eliminarAdmision); // Eliminar admisión de un paciente
 module.exports = router;
 
 // Exportar el router para usarlo en el servidor principal

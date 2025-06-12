@@ -1,67 +1,74 @@
-const{
-    agregarHabitacion,
-    actualizarHabitacion,
-    obtenerHabitaciones,
-    obtenerHabitacionPorId,
-    obtenerHabitacionesDisponibles,
-    eliminarHabitacionPorId,
-} = require('../modelo/habitacion');
-const { pacientes } = require('../modelo/paciente');
 
-// Controlador para manejar las operaciones relacionadas con las habitaciones
-class HabitacionController {
-    // Listar todas las habitaciones
-    static listarHabitaciones(req, res) {
-        const habitaciones = obtenerHabitaciones();
-        res.render('habitacion/listar', { habitaciones });
+const { Habitacion } = require('../models');
+
+const habitacionController = {
+  listarHabitaciones: async function (req, res) {
+    try {
+      const habitaciones = await Habitacion.findAll();
+      res.render('habitacion/listar', { habitaciones });
+    } catch (error) {
+      console.error('Error al listar habitaciones:', error);
+      res.status(500).send('Error al listar habitaciones');
     }
+  },
 
-    // Ver detalles de una habitación específica
-    static verHabitacion(req, res) {
-        const habitacionId = parseInt(req.params.id);
-        const habitacion = obtenerHabitacionPorId(habitacionId);
-        if (!habitacion) return res.status(404).send('Habitación no encontrada');
-        res.render('habitacion/detalle', { habitacion });
+  nuevaHabitacion: async function (req, res) {
+    try {
+      res.render('habitacion/formulario');
+    } catch (error) {
+      console.error('Error al mostrar formulario:', error);
+      res.status(500).send('Error al mostrar formulario');
     }
+  },
 
-    // Crear una nueva habitación
-    static crearHabitacion(req, res) {
-        const { numero, tipo, disponible } = req.body;
-        const nuevaHabitacion = agregarHabitacion({ numero, tipo, disponible: disponible === 'on' });
-        res.redirect('/habitaciones');
+  crearHabitacion: async function (req, res) {
+    try {
+      const { numero, ala } = req.body;
+      await Habitacion.create({ numero, ala });
+      res.redirect('/habitacion');
+    } catch (error) {
+      console.error('Error al crear habitación:', error);
+      res.status(500).send('Error al crear habitación');
     }
+  },
 
-    // Actualizar una habitación existente
-    static actualizarHabitacion(req, res) {
-        const habitacionId = parseInt(req.params.id);
-        const { numero, tipo, disponible } = req.body;
-        const habitacionActualizada = actualizarHabitacion(habitacionId, { numero, tipo, disponible: disponible === 'on' });
-        if (!habitacionActualizada) return res.status(404).send('Habitación no encontrada');
-        res.redirect(`/habitaciones/${habitacionId}`);
+  verHabitacion: async function (req, res) {
+    try {
+      const habitacion = await Habitacion.findByPk(req.params.id);
+      if (!habitacion) return res.status(404).send('Habitación no encontrada');
+      res.render('habitacion/ver', { habitacion });
+    } catch (error) {
+      console.error('Error al ver habitación:', error);
+      res.status(500).send('Error al cargar habitación');
     }
+  },
 
-    // Eliminar una habitación
-    static eliminarHabitacion(req, res) {
-        const habitacionId = parseInt(req.params.id);
-        const habitacionEliminada = eliminarHabitacionPorId(habitacionId);
-        if (!habitacionEliminada) return res.status(404).send('Habitación no encontrada');
-        res.redirect('/habitaciones');
+  actualizarHabitacion: async function (req, res) {
+    try {
+      const habitacion = await Habitacion.findByPk(req.params.id);
+      if (!habitacion) return res.status(404).send('Habitación no encontrada');
+
+      const { numero, ala } = req.body;
+      await habitacion.update({ numero, ala });
+      res.redirect(`/habitacion/${habitacion.id}`);
+    } catch (error) {
+      console.error('Error al actualizar habitación:', error);
+      res.status(500).send('Error al actualizar habitación');
     }
-    // Listar habitaciones disponibles
-    static listarHabitacionesDisponibles(req, res) {
-        const habitacionesDisponibles = obtenerHabitacionesDisponibles();
-        res.render('habitacion/disponibles', { habitaciones: habitacionesDisponibles });
+  },
+
+  eliminarHabitacion: async function (req, res) {
+    try {
+      const habitacion = await Habitacion.findByPk(req.params.id);
+      if (!habitacion) return res.status(404).send('Habitación no encontrada');
+
+      await habitacion.destroy();
+      res.redirect('/habitacion');
+    } catch (error) {
+      console.error('Error al eliminar habitación:', error);
+      res.status(500).send('Error al eliminar habitación');
     }
-    // Ver habitaciones de un paciente específico
-    static verHabitacionesPaciente(req, res) {
-        const pacienteId = parseInt(req.params.id);
-        const paciente = pacientes.find(p => p.id === pacienteId);
-        if (!paciente) return res.status(404).send('Paciente no encontrado');
+  }
+};
 
-        res.render('habitacion/paciente', { paciente, habitaciones: [] });
-    }
-
-
-
-}
-module.exports = HabitacionController;
+module.exports = habitacionController;
