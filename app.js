@@ -41,6 +41,22 @@ app.use('/cama', camaRouter); //usa las rutas de cama
 app.use('/internacion', internacionRouter); //usa las rutas de internacion
 app.use('/paciente', pacientesRouter); //usa las rutas de pacientes
 
+
+/*Middleware para manejar rutas no encontradas (404)
+app.use((req, res) => {
+  console.log('middleware de ruta no encontrada ejecutado');
+  res.status(404).send('Página no encontrada');
+});
+
+// Middleware para manejar errores del servidor (500)
+app.use((err, req, res, next) => {
+  console.log('middleware de error ejecutado');
+  console.error(err.stack);
+  res.status(500).send('Ocurrió un error interno en el servidor');
+});*/
+
+
+
 //conexion con la base de datos
 sequelize.sync({ alter: true })  
   .then(() => {
@@ -57,31 +73,9 @@ sequelize.sync({ alter: true })
 
 
 
-//error 404 
-app.use((req, res, next) => {
-    res.status(404).render('error', { 
-        title: 'Error 404', 
-        message: 'Página no encontrada' });
-
-});
-
-// manejo de errores
-app.use((err, req, res, next) => {
-    console.error(err.stack); //imprime el error en la consola
-    res.status(500).render('error', { 
-        title: 'Error 500', 
-        message: 'Error interno del servidor' });
-});
 
 
 
-
-
-const PORT = 3000; //puerto donde se ejecutara la aplicacion
-
-app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
-});
 
 
 

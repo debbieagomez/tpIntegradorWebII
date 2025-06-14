@@ -1,17 +1,17 @@
 doctype html
 html
   head
-    title Sistema HIS
-    meta(charset="utf-8")
-    link(rel="stylesheet", href="/estilos.css")
+    title Sistema de Gestión Hospitalaria
+    link(rel='stylesheet', href='/estilos.css') // si tenés CSS
   body
     header
       h1 Sistema de Gestión Hospitalaria
       nav
         ul
-          li: a(href="/") Inicio
-          li: a(href="/paciente") Pacientes
-          li: a(href="/admision") Admisiones
+          li: a(href='/') Inicio
+          li: a(href='/paciente/nuevo') Registrar nuevo paciente
+          li: a(href='/paciente') Pacientes
+          li: a(href='/admision/nueva') Nueva admisión
+          li: a(href='/admision') Admisiones
     main
       block content
-

@@ -3,10 +3,6 @@ const router = express.Router();
 const pacienteController = require('../controller/pacienteController');
 
 
-console.log('listarPacientes:', typeof pacienteController.listarPacientes);
-console.log('editarPaciente:', typeof pacienteController.editarPaciente);
-console.log('actualizarPaciente:', typeof pacienteController.actualizarPaciente);
-console.log('eliminarPaciente:', typeof pacienteController.eliminarPaciente);
 
 router.get('/', pacienteController.listarPacientes);
 router.get('/nuevo', pacienteController.nuevoPaciente);

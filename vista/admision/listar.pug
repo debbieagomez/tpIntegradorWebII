@@ -11,8 +11,8 @@ block content
       each admision in admisiones
         li
           | Paciente ID: #{admision.pacienteId} - Fecha: #{admision.fechaIngreso} - Motivo: #{admision.motivoIngreso}
-          a(href=`/admision/${admision.pacienteId}`) 🔍 Ver
-          a(href=`/admision/${admision.pacienteId}/editar`) 🖊 Editar
+          a(href=`/admision/${admision.pacienteId}`) 
+          a(href=`/admision/${admision.pacienteId}/editar`) 
           form(method='POST', action=`/admision/${admision.pacienteId}/eliminar`, style='display:inline')
-            button(type='submit') ❌ Eliminar
+            button(type='submit') 
 
