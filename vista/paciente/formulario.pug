@@ -1,16 +1,24 @@
 extends ../layout
 
-form(method='POST', action='/paciente/nuevo')
-  label Nombre:
-  input(type='text', name='nombre', required)
+block content
+  h2 #{paciente ? 'Editar Paciente' : 'Registro de Paciente'}
+
+  form(method='POST', action=paciente ? `/paciente/${paciente.id}/editar` : '/paciente/nuevo')
+    label(for='nombre') Nombre:
+    input(type='text', name='nombre', value=paciente ? paciente.nombre : '', required)
+    br
+
+    label(for='dni') DNI:
+    input(type='text', name='dni', value=paciente ? paciente.dni : '', required)
+    br
+
+    label(for='sexo') Sexo:
+    select(name='sexo')
+      option(value='M', selected=paciente ? paciente.sexo === 'M' : false) Masculino
+      option(value='F', selected=paciente ? paciente.sexo === 'F' : false) Femenino
+    br
+
+    button(type='submit') Registrar
+
   br
-  label DNI:
-  input(type='text', name='dni', required)
-  br
-  label Sexo:
-  select(name='sexo')
-    option(value='F') Femenino
-    option(value='M') Masculino
-  br
-  button(type='submit') Registrar
-    a(href='/paciente/listar') Volver a la lista de pacientes
+  a(href='/paciente') Volver a la lista de pacientes

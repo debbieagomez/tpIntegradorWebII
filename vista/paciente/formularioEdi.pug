@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+  h2 Editar paciente
+
+  form(method='POST', action=`/paciente/${paciente.id}/editar`)
+    label Nombre:
+    input(type='text', name='nombre', value=paciente.nombre, required)
+    br
+    label DNI:
+    input(type='text', name='dni', value=paciente.dni, required)
+    br
+    label Sexo:
+    select(name='sexo')
+      option(value='F', selected=paciente.sexo === 'F') Femenino
+      option(value='M', selected=paciente.sexo === 'M') Masculino
+    br
+    button(type='submit') Guardar cambios

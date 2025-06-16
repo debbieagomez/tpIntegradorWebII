@@ -1,1 +1,15 @@
-extends ../../layout
+extends ../layout
+
+block content
+  h2 Detalle del Paciente
+
+  if mensaje
+    p(style="color: green") #{mensaje}
+
+  p Nombre: #{paciente.nombre}
+  p DNI: #{paciente.dni}
+  p Sexo: #{paciente.sexo}
+
+  a(href=`/paciente/${paciente.id}/editar`) Editar
+  form(method='POST', action=`/paciente/${paciente.id}/eliminar`)
+    button(type='submit') Eliminar

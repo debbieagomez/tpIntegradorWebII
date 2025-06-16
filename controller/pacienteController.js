@@ -22,6 +22,7 @@ async function nuevoPaciente(req, res) {
 
 async function crearPaciente(req, res) {
   try {
+    console.log('Datos recibidos:', req.body);
     const { nombre, dni, sexo } = req.body;
     await Paciente.create({ nombre, dni, sexo });
     res.redirect('/paciente');
@@ -35,7 +36,10 @@ async function verPaciente(req, res) {
   try {
     const paciente = await Paciente.findByPk(req.params.id);
     if (!paciente) return res.status(404).send('Paciente no encontrado');
-    res.render('paciente/detalle', { paciente });
+
+    const mensaje = req.query.editado || null;
+
+    res.render('paciente/detalle', { paciente, mensaje });
   } catch (error) {
     console.error('Error al ver paciente:', error);
     res.status(500).send('Error al mostrar el paciente');
@@ -60,7 +64,9 @@ async function actualizarPaciente(req, res) {
     if (!paciente) return res.status(404).send('Paciente no encontrado');
 
     await paciente.update({ nombre, dni, sexo });
-    res.redirect(`/paciente/${paciente.id}`);
+
+
+    res.redirect(`/paciente/${paciente.id}?mensaje=paciente editado correctamente`);
   } catch (error) {
     console.error('Error al actualizar paciente:', error);
     res.status(500).send('Error al actualizar el paciente');

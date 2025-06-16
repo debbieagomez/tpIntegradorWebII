@@ -9,7 +9,8 @@ block content
       each paciente in pacientes
         li
           | #{paciente.nombre} - DNI: #{paciente.dni} - Sexo: #{paciente.sexo}
-          a(href=`/paciente/${paciente.id}/editar`) 🖊 Editar
+          a(href=`/paciente/${paciente.id}/editar`) 🖊 Editar  
+          br
           form(method='POST', action=`/paciente/${paciente.id}/eliminar`, style='display:inline')
             button(type='submit') ❌ Eliminar
 
