@@ -12,4 +12,3 @@ router.post('/:id/eliminar', admisionController.eliminarAdmision);
 module.exports = router;
 
 // Exportar el router para usarlo en el servidor principal
-// module.exports = router;

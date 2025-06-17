@@ -10,11 +10,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     estado: {
       type: DataTypes.STRING,
-      defaultValue: 'activa'  
+      defaultValue: 'activa'
     }
   });
 
+  // Relaciones
+  Internacion.associate = (models) => {
+    Internacion.belongsTo(models.Admision, { foreignKey: 'admisionId' });
+  };
+
   return Internacion;
 };
-
-

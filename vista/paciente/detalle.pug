@@ -6,10 +6,13 @@ block content
   if mensaje
     p(style="color: green") #{mensaje}
 
-  p Nombre: #{paciente.nombre}
-  p DNI: #{paciente.dni}
-  p Sexo: #{paciente.sexo}
+  p Nombre y Apellido: #{paciente.nombre}
+  p  DNI: #{paciente.dni}
+  p  Sexo: #{paciente.sexo}
+  p  Seguro: #{paciente.seguro ? 'Sí' : 'No posee'}
 
   a(href=`/paciente/${paciente.id}/editar`) Editar
   form(method='POST', action=`/paciente/${paciente.id}/eliminar`)
     button(type='submit') Eliminar
+    br
+    a(href= '/paciente') Volver a la lista de pacientes

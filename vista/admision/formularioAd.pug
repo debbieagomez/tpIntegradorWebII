@@ -1,9 +1,26 @@
 extends ../layout
 
-doctype html
-html
-  head
-    title Test admisión
-  body
-    h1 Formulario Admisión cargado
-    p Si ves esto, el archivo está funcionando
+block content
+  h2 Nueva Admisión
+
+  form(method='POST', action='/admision/nueva')
+    label(for='pacienteId') Paciente:
+    select(name='pacienteId', required)
+      each paciente in pacientes
+        option(value=paciente.id)= paciente.nombre
+
+    label(for='camaId') Cama disponible:
+    select(name='camaId', required)
+      each cama in camas
+        option(value=cama.id)= `Cama ${cama.numero} - Habitación ${cama.Habitacion.numero}`
+
+    label(for='motivoIngreso') Motivo de ingreso:
+    input(type='text', name='motivoIngreso', required)
+
+    label(for='fechaIngreso') Fecha de ingreso:
+    input(type='date', name='fechaIngreso', required)
+
+    label(for='seguro') Seguro médico:
+    input(type='checkbox', name='seguro')
+
+    button(type='submit') Registror 

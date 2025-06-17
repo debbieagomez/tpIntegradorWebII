@@ -1,4 +1,4 @@
-const { Admision, Paciente, Cama, Habitacion } = require('../models');
+const { Admision, Paciente, Cama, Habitacion } = require ('../models');
 const { Op } = require('sequelize');
 
 const admisionController = {
@@ -16,27 +16,36 @@ const admisionController = {
 
   nuevaAdmision: async function (req, res) {
     try {
+      console.log('entrando a nuevaAdmision');
       const pacientes = await Paciente.findAll();
-      const camas = await Cama.findAll({ where: { disponible: true } });
+      console.log('pacientes', pacientes);
+      const camas = await Cama.findAll({
+        where: { disponible: true },
+        include: [Habitacion]
+      });
+      console.log('camas', camas);
       res.render('admision/formularioAd', { pacientes, camas });
     } catch (error) {
-      console.error('Error al mostrar formulario de admisión:', error);
-      res.status(500).send('Error al cargar el formulario');
+       console.error('Error al mostrar formulario de admisión:', error);
+      //res.status(500).send('Error al cargar el formulario');
     }
   },
 
   crearAdmision: async function (req, res) {
     try {
-      const { pacienteId, camaId, motivoIngreso, fechaIngreso } = req.body;
+      const { pacienteId, camaId, motivoIngreso, fechaIngreso, seguro } = req.body;
 
       const paciente = await Paciente.findByPk(pacienteId);
-      const cama = await Cama.findByPk(camaId, { include: Habitacion });
+      const cama = await Cama.findByPk(camaId, {
+        include: Habitacion
+      });
 
       if (!paciente || !cama || !cama.disponible) {
-        return res.status(400).send('Paciente o cama inválida');
+        return res.status(400).send('Paciente o cama inválida o no disponible');
       }
 
       const habitacion = cama.Habitacion;
+
       const camasOcupadas = await Cama.findAll({
         where: {
           habitacionId: habitacion.id,
@@ -45,29 +54,26 @@ const admisionController = {
         },
         include: {
           model: Admision,
-          where: { fechaEgreso: null }
+          where: { fechaEgreso: null },
+          include: [Paciente]
         }
       });
 
-      const conflictoSexo = await Promise.all(
-        camasOcupadas.map(async camaOcupada => {
-          const adm = await Admision.findOne({
-            where: { camaId: camaOcupada.id, fechaEgreso: null },
-            include: Paciente
-          });
-          return adm && adm.Paciente.sexo !== paciente.sexo;
-        })
-      );
+      const conflictoSexo = camasOcupadas.some(camaOcupada => {
+        return camaOcupada.Admisions.some(adm => adm.Paciente.sexo !== paciente.sexo);
+      });
 
-      if (conflictoSexo.includes(true)) {
+      if (conflictoSexo) {
         return res.status(400).send('Conflicto de sexo en habitación compartida.');
       }
 
+      
       await Admision.create({
         pacienteId,
         camaId,
         motivoIngreso,
         fechaIngreso,
+        seguro: seguro === 'on' || seguro === true,
         estado: 'activa'
       });
 

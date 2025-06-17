@@ -4,7 +4,7 @@ block content
   h2 #{paciente ? 'Editar Paciente' : 'Registro de Paciente'}
 
   form(method='POST', action=paciente ? `/paciente/${paciente.id}/editar` : '/paciente/nuevo')
-    label(for='nombre') Nombre:
+    label(for='nombre') Nombre y Apellido:
     input(type='text', name='nombre', value=paciente ? paciente.nombre : '', required)
     br
 
@@ -18,7 +18,10 @@ block content
       option(value='F', selected=paciente ? paciente.sexo === 'F' : false) Femenino
     br
 
-    button(type='submit') Registrar
+    label(for='seguro') Tiene Seguro:
+    input(type='checkbox', name='seguro', checked=paciente ? paciente.seguro : false)
+
+    button(type='submit')= paciente ? 'Guardar Cambios' : 'Registrar Paciente'
 
   br
   a(href='/paciente') Volver a la lista de pacientes

@@ -1,18 +1,17 @@
 module.exports = (sequelize, DataTypes) => {
-  const Cama = sequelize.define('Cama', {
+  const Habitacion = sequelize.define('Habitacion', {
     numero: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    tipo: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    disponible: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true
+    tipo: {
+      type: DataTypes.STRING
     }
   });
 
-  return Cama;
+  Habitacion.associate = (models) => {
+    Habitacion.hasMany(models.Cama, { foreignKey: 'habitacionId' }); // ✅
+  };
+
+  return Habitacion;
 };
