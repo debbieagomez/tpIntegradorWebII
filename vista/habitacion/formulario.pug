@@ -1,0 +1,15 @@
+extends ../layout
+
+block content
+  h2 Agregar Habitacion
+
+  form(method='POST', action='/habitacion/nueva')
+    label Número:
+    input(type='text', name='numero', required)
+
+    label Tipo:
+    select(name='tipo')
+      option(value='privada') Privada
+      option(value='compartida') Compartida
+
+    button(type='submit') agregar habitacion

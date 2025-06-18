@@ -15,4 +15,8 @@ block content
       option(value='F', selected=paciente.sexo === 'F') Femenino
       option(value='M', selected=paciente.sexo === 'M') Masculino
     br
+    label
+    input(type='checkbox', name='seguro', checked=paciente.seguro)
+    | Tiene seguro médico
+    br
     button(type='submit') Guardar cambios

@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+  h2 agregar camas 
+
+  form(method='POST', action='/cama/nueva')
+    label Número de cama:
+    input(type='text', name='numero', required)
+
+    label Tipo:
+    select(name='tipo')
+      option(value='común') Común
+      option(value='especial') Especial
+
+    label Habitación:
+    select(name='habitacionId', required)
+      each habitacion in habitaciones
+        option(value=habitacion.id)= `Habitación ${habitacion.numero} (${habitacion.tipo})`
+
+    button(type='submit') Agregar camas 

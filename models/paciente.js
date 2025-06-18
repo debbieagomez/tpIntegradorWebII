@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     nombre: DataTypes.STRING,
     dni: DataTypes.STRING,
     sexo: DataTypes.STRING,
-    tieneseguro: {
+    seguro: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false

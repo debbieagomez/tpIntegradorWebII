@@ -59,11 +59,19 @@ async function editarPaciente(req, res) {
 
 async function actualizarPaciente(req, res) {
   try {
+    console.log(req.body);
     const { nombre, dni, sexo, seguro } = req.body;
     const paciente = await Paciente.findByPk(req.params.id);
     if (!paciente) return res.status(404).send('Paciente no encontrado');
 
-    await paciente.update({ nombre, dni, sexo, seguro });
+    const seguroValue = req.body.seguro === 'on' ? true : false;
+
+    await paciente.update({
+      nombre,
+      dni,
+      sexo,
+      seguro: seguroValue,
+    });
 
     res.redirect(`/paciente/${paciente.id}?mensaje=paciente editado correctamente`);
   } catch (error) {
