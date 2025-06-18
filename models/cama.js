@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     tipo: DataTypes.STRING,
     disponible: {
       type: DataTypes.BOOLEAN,
+      allowNull: false,
       defaultValue: true
     }
   });

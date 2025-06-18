@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+  h2 Lista de Camas
+
+  a(href='/cama/nueva') + Agregar nueva cama
+
+  if camas.length === 0
+    p No hay camas registradas.
+  else
+    table
+      thead
+        tr
+          th ID
+          th Número
+          th Tipo
+          th Disponible
+          th Habitación
+          th Acciones
+      tbody
+        each cama in camas
+          tr
+            td= cama.id
+            td= cama.numero
+            td= cama.tipo
+            td= cama.disponible ? 'Sí' : 'No'
+            td= cama.Habitacion ? cama.Habitacion.numero : 'Sin asignar'
+            td
+              a(href=`/cama/${cama.id}/editar`) Editar 
+              br
+              form(method='POST', action=`/cama/${cama.id}/eliminar`, style='display:inline')
+        
+                button(type='submit') Eliminar

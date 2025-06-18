@@ -32,11 +32,13 @@ const camaController = {
 
   crearCama: async function (req, res) {
     try {
-      const { numero, tipo, disponible, habitacionId } = req.body;
+      console.log(req.body);
+      const { numero, tipo, habitacionId } = req.body;
+      const disponible = req.body.disponible === 'on' ? true : false;
       await Cama.create({
         numero,
         tipo,
-        disponible: disponible === 'true',
+        disponible,
         habitacionId
       });
       res.redirect('/cama');

@@ -7,11 +7,25 @@ html
     header
       h1 Sistema de Gestión Hospitalaria
       nav
-        ul
-          li: a(href='/') Inicio
-          li: a(href='/paciente/nuevo') Registrar nuevo paciente
-          li: a(href='/paciente') Pacientes
-          li: a(href='/admision/nueva') Nueva admisión
-          li: a(href='/admision') Admisiones
+  ul
+    li: a(href='/') Inicio
+    li
+      strong Pacientes
+      ul
+        li: a(href='/paciente') Ver pacientes
+        li: a(href='/paciente/nuevo') Registrar paciente
+    li
+      strong Admisiones
+      ul
+        li: a(href='/admision') Ver admisiones
+        li: a(href='/admision/nueva') Nueva admisión
+    li
+      strong Infraestructura
+      ul
+        li: a(href='/habitacion') Ver habitaciones
+        li: a(href='/habitacion/nueva') Crear habitación
+        li: a(href='/cama') Ver camas
+        li: a(href='/cama/nueva') Crear cama
+
     main
       block content

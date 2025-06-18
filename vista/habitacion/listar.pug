@@ -1,0 +1,27 @@
+extends ../layout
+
+block content
+  h2 Lista de Habitaciones
+
+  a(href='/habitacion/nueva') + Agregar nueva habitación
+
+  if habitaciones.length === 0
+    p No hay habitaciones registradas.
+  else
+    table
+      thead
+        tr
+          th ID
+          th Número
+          th Tipo
+          th Acciones
+      tbody
+        each habitacion in habitaciones
+          tr
+            td= habitacion.id
+            td= habitacion.numero
+            td= habitacion.tipo
+            td
+              a(href=`/habitacion/${habitacion.id}/editar`) Editar
+              form(method='POST', action=`/habitacion/${habitacion.id}/eliminar`, style='display:inline')
+                button(type='submit') Eliminar

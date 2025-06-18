@@ -17,4 +17,8 @@ block content
       each habitacion in habitaciones
         option(value=habitacion.id)= `Habitación ${habitacion.numero} (${habitacion.tipo})`
 
-    button(type='submit') Agregar camas 
+
+    label Disponible:
+    input(type='checkbox', name='disponible')
+
+    button(type='submit') Agregar cama

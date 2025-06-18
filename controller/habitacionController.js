@@ -23,8 +23,8 @@ const habitacionController = {
 
   crearHabitacion: async function (req, res) {
     try {
-      const { numero, ala } = req.body;
-      await Habitacion.create({ numero, ala });
+      const { numero, tipo } = req.body;
+      await Habitacion.create({ numero, tipo });
       res.redirect('/habitacion');
     } catch (error) {
       console.error('Error al crear habitación:', error);
